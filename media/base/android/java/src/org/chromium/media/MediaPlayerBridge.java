@@ -36,11 +36,18 @@ import java.util.HashMap;
 @JNINamespace("media")
 public class MediaPlayerBridge {
 
+    /**
+    * Give the host application a chance to take over MeidaPlayer.
+    */
     public static class ResourceLoadingFilter {
         public boolean shouldOverrideResourceLoading(
                 MediaPlayer mediaPlayer, Context context, Uri uri) {
             return false;
         }
+    
+        public MediaPlayer getExternalMediaPlayer() {
+            return null;
+        }    
     }
 
     private static ResourceLoadingFilter sResourceLoadFilter = null;
@@ -80,7 +87,8 @@ public class MediaPlayerBridge {
 
     protected MediaPlayer getLocalPlayer() {
         if (mPlayer == null) {
-            mPlayer = new MediaPlayer();
+            mPlayer = sResourceLoadFilter.getExternalMediaPlayer();
+            if (mPlayer == null) mPlayer = new MediaPlayer();           
         }
         return mPlayer;
     }
